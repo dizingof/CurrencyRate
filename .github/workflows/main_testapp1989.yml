@@ -61,5 +61,5 @@ jobs:
         with:
           app-name: 'testapp1989'
           slot-name: 'Production'
-          package: .net-app
+          package: ./myapp
           
