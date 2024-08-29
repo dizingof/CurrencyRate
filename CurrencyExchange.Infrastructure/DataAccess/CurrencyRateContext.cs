@@ -14,7 +14,7 @@ namespace CurrencyExchange.Infrastructure.DataAccess
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseMongoDB("mongodb://localhost:27017", "CurrencyRateDb");
+            optionsBuilder.UseMongoDB("mongodb+srv://romannep1989:kOE3i30iZnYPd5zk@cluster0.udc4owj.mongodb.net/", "CurrencyRate");
         }
     }
 }

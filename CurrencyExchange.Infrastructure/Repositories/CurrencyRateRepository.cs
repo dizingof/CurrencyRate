@@ -1,6 +1,7 @@
 ﻿using CurrencyExchange.Infrastructure.DataAccess;
 using CurrencyRate.Application.DataAccess.Repositories;
 using CurrencyRate.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace CurrencyExchange.Infrastructure.Repositories
 {
@@ -13,9 +14,15 @@ namespace CurrencyExchange.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task AddAsync(CurrencyRateEntity entity)
+        public async Task AddAsync(CurrencyRateEntity currencyRateEntity)
         {
-            await _context.CurrencyRates.AddAsync(entity);
+            await _context.CurrencyRates.AddAsync(currencyRateEntity);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task AddRangeAsync(List<CurrencyRateEntity> currencyRateEntities)
+        {
+            await _context.CurrencyRates.AddRangeAsync(currencyRateEntities);
             await _context.SaveChangesAsync();
         }
 

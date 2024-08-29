@@ -1,17 +1,25 @@
 ﻿using Coravel.Invocable;
 using CurrencyRate.Application.DataAccess.Query;
+using CurrencyRate.Application.DataAccess.Repositories;
 using CurrencyRate.Domain.Constants;
 using CurrencyRate.Domain.Entities;
+using MongoDB.Bson;
 
 namespace CurrencyRate.Application.Job;
 
 public class CurrencyRateJob : IInvocable
 {
     private readonly ICurrencyRateQuery _currencyRateQuery;
+    private readonly ICurrencyRateRepository _currencyRateRepository;
 
-    public CurrencyRateJob(ICurrencyRateQuery currencyRateQuery)
+    public CurrencyRateJob
+    (
+        ICurrencyRateQuery currencyRateQuery,
+        ICurrencyRateRepository currencyRateRepository
+    )
     {
         _currencyRateQuery = currencyRateQuery;
+        _currencyRateRepository = currencyRateRepository;
     }
 
     public async Task Invoke()
@@ -25,6 +33,9 @@ public class CurrencyRateJob : IInvocable
         var allRates = results.SelectMany(r => r).ToList();
 
         var currencyRateEntities = CreateCurrencyRateEntity(allRates);
+
+        await _currencyRateRepository.AddRangeAsync(currencyRateEntities);
+
     }
 
     private List<CurrencyRateEntity> CreateCurrencyRateEntity(List<RateDto> rateDtos)
@@ -34,7 +45,7 @@ public class CurrencyRateJob : IInvocable
         {
             var currencyRateEntity = new CurrencyRateEntity
             {
-                Id = Guid.NewGuid(),
+                _id = ObjectId.GenerateNewId(),
                 CreatedDate = DateTime.Now,
                 BuyRate = decimal.Parse(rateDto.BuyRate),
                 SellRate = decimal.Parse(rateDto.SellRate),
