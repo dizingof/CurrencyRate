@@ -32,7 +32,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 
 app.Services.UseScheduler(scheduler =>
 {
-    scheduler.Schedule<CurrencyRateJob>().EveryFiveMinutes();
+    scheduler.Schedule<CurrencyRateJob>().EverySeconds(50);
 });
 
 app.UseHttpsRedirection();

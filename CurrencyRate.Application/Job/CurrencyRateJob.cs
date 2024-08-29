@@ -3,6 +3,7 @@ using CurrencyRate.Application.DataAccess.Query;
 using CurrencyRate.Application.DataAccess.Repositories;
 using CurrencyRate.Domain.Constants;
 using CurrencyRate.Domain.Entities;
+using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 
 namespace CurrencyRate.Application.Job;
@@ -11,31 +12,44 @@ public class CurrencyRateJob : IInvocable
 {
     private readonly ICurrencyRateQuery _currencyRateQuery;
     private readonly ICurrencyRateRepository _currencyRateRepository;
+    private readonly ILogger<CurrencyRateJob> _logger;
 
     public CurrencyRateJob
     (
         ICurrencyRateQuery currencyRateQuery,
-        ICurrencyRateRepository currencyRateRepository
+        ICurrencyRateRepository currencyRateRepository,
+        ILogger<CurrencyRateJob> logger
     )
     {
         _currencyRateQuery = currencyRateQuery;
         _currencyRateRepository = currencyRateRepository;
+        _logger = logger;
     }
 
     public async Task Invoke()
     {
-        var usdTask = _currencyRateQuery.Execute(Urls.AddressUsdPage, Selectors.SelectorForUsdRatesSheets);
-        var eurTask = _currencyRateQuery.Execute(Urls.AddressEurPage, Selectors.SelectorForEurRatesSheets);
-        var plnTask = _currencyRateQuery.Execute(Urls.AddressPlnPage, Selectors.SelectorForPlnRatesSheets);
 
-        var results = await Task.WhenAll(usdTask, eurTask, plnTask);
+        try
+        {
+            _logger.LogInformation("Job started");
+            var usdTask = _currencyRateQuery.Execute(Urls.AddressUsdPage, Selectors.SelectorForUsdRatesSheets);
+            var eurTask = _currencyRateQuery.Execute(Urls.AddressEurPage, Selectors.SelectorForEurRatesSheets);
+            var plnTask = _currencyRateQuery.Execute(Urls.AddressPlnPage, Selectors.SelectorForPlnRatesSheets);
 
-        var allRates = results.SelectMany(r => r).ToList();
+            var results = await Task.WhenAll(usdTask, eurTask, plnTask);
 
-        var currencyRateEntities = CreateCurrencyRateEntity(allRates);
+            var allRates = results.SelectMany(r => r).ToList();
 
-        await _currencyRateRepository.AddRangeAsync(currencyRateEntities);
+            var currencyRateEntities = CreateCurrencyRateEntity(allRates);
 
+            await _currencyRateRepository.AddRangeAsync(currencyRateEntities);
+            _logger.LogInformation("Job finished");
+        }
+        catch (Exception ex) 
+        {
+            _logger.LogError($"Job finished with error: {ex.Message}");
+        }
+        
     }
 
     private List<CurrencyRateEntity> CreateCurrencyRateEntity(List<RateDto> rateDtos)
