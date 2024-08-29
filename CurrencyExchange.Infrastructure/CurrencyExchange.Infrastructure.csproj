@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MongoDB.EntityFrameworkCore" Version="8.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CurrencyRate.Application\CurrencyRate.Application.csproj" />
   </ItemGroup>
 

@@ -1,3 +1,8 @@
+using Coravel;
+using CurrencyExchange.Infrastructure.DataAccess.Query;
+using CurrencyRate.Application.DataAccess.Query;
+using CurrencyRate.Application.Job;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -6,6 +11,10 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScheduler();
+builder.Services.AddScoped<CurrencyRateJob>();
+builder.Services.AddScoped<ICurrencyRateQuery, CurrencyRateQuery>();
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
@@ -15,6 +24,11 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.Services.UseScheduler(scheduler =>
+{
+    scheduler.Schedule<CurrencyRateJob>().EveryFiveSeconds();
+});
 
 app.UseHttpsRedirection();
 
