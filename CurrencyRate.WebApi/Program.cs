@@ -42,7 +42,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 
 app.Services.UseScheduler(scheduler =>
 {
-    scheduler.Schedule<CurrencyRateJob>().EverySeconds(50);
+    scheduler.Schedule<CurrencyRateJob>().Hourly();
 });
 
 app.UseExceptionHandler(_ => { });
