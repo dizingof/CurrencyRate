@@ -26,8 +26,9 @@ builder.Services.AddSingleton<CurrencyRateContext>();
 builder.Services.AddExceptionHandler<ExceptionHandler>();
 
 builder.Logging.ClearProviders();
-builder.Logging.AddAzureWebAppDiagnostics();
 builder.Logging.AddFilter("Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddleware", LogLevel.None);
+builder.Logging.AddAzureWebAppDiagnostics();
+
 var app = builder.Build();
 
 
