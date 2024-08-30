@@ -12,6 +12,11 @@ using Microsoft.Extensions.Logging.Configuration;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
+builder.Logging.AddAzureWebAppDiagnostics();
+builder.Logging.AddFilter("Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddleware", LogLevel.None);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -25,11 +30,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddSingleton<CurrencyRateContext>();
 builder.Services.AddExceptionHandler<ExceptionHandler>();
 
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
 
-builder.Logging.AddAzureWebAppDiagnostics();
-builder.Logging.AddFilter("Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddleware", LogLevel.None);
 
 var app = builder.Build();
 
