@@ -6,14 +6,15 @@ using CurrencyRate.Application.DataAccess.Query;
 using CurrencyRate.Application.DataAccess.Repositories;
 using CurrencyRate.Application.Job;
 using CurrencyRate.WebApi.RequestHandle;
+using DnsClient;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.AzureAppServices;
 using Microsoft.Extensions.Logging.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
 
 builder.Logging.AddAzureWebAppDiagnostics();
 builder.Logging.AddFilter("Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddleware", LogLevel.None);
