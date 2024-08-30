@@ -31,18 +31,18 @@ public class CurrencyRateJob : IInvocable
         try
         {
             _logger.LogInformation("Job started");
-            
-            //var usdTask = _currencyRateQuery.Execute(Urls.AddressUsdPage, Selectors.SelectorForUsdRatesSheets);
-            //var eurTask = _currencyRateQuery.Execute(Urls.AddressEurPage, Selectors.SelectorForEurRatesSheets);
-            //var plnTask = _currencyRateQuery.Execute(Urls.AddressPlnPage, Selectors.SelectorForPlnRatesSheets);
 
-            //var results = await Task.WhenAll(usdTask, eurTask, plnTask);
+            var usdTask = _currencyRateQuery.Execute(Urls.AddressUsdPage, Selectors.SelectorForUsdRatesSheets);
+            var eurTask = _currencyRateQuery.Execute(Urls.AddressEurPage, Selectors.SelectorForEurRatesSheets);
+            var plnTask = _currencyRateQuery.Execute(Urls.AddressPlnPage, Selectors.SelectorForPlnRatesSheets);
 
-            //var allRates = results.SelectMany(r => r).ToList();
+            var results = await Task.WhenAll(usdTask, eurTask, plnTask);
 
-            //var currencyRateEntities = CreateCurrencyRateEntity(allRates);
+            var allRates = results.SelectMany(r => r).ToList();
 
-            //await _currencyRateRepository.AddRangeAsync(currencyRateEntities);
+            var currencyRateEntities = CreateCurrencyRateEntity(allRates);
+
+            await _currencyRateRepository.AddRangeAsync(currencyRateEntities);
 
             _logger.LogInformation("Job finished");
         }
