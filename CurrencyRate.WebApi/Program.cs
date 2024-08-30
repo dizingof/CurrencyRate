@@ -6,6 +6,8 @@ using CurrencyRate.Application.DataAccess.Query;
 using CurrencyRate.Application.DataAccess.Repositories;
 using CurrencyRate.Application.Job;
 using CurrencyRate.WebApi.RequestHandle;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +26,8 @@ builder.Services.AddSingleton<CurrencyRateContext>();
 builder.Services.AddExceptionHandler<ExceptionHandler>();
 
 builder.Logging.ClearProviders();
-builder.Logging.AddAzureWebAppDiagnostics().AddFilter("Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddleware", LogLevel.None); ;
+builder.Logging.AddAzureWebAppDiagnostics();
+builder.Logging.AddFilter("Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddleware", LogLevel.None);
 var app = builder.Build();
 
 
