@@ -28,26 +28,27 @@ public class CurrencyRateJob : IInvocable
 
     public async Task Invoke()
     {
-
         try
         {
             _logger.LogInformation("Job started");
-            var usdTask = _currencyRateQuery.Execute(Urls.AddressUsdPage, Selectors.SelectorForUsdRatesSheets);
-            var eurTask = _currencyRateQuery.Execute(Urls.AddressEurPage, Selectors.SelectorForEurRatesSheets);
-            var plnTask = _currencyRateQuery.Execute(Urls.AddressPlnPage, Selectors.SelectorForPlnRatesSheets);
+            
+            //var usdTask = _currencyRateQuery.Execute(Urls.AddressUsdPage, Selectors.SelectorForUsdRatesSheets);
+            //var eurTask = _currencyRateQuery.Execute(Urls.AddressEurPage, Selectors.SelectorForEurRatesSheets);
+            //var plnTask = _currencyRateQuery.Execute(Urls.AddressPlnPage, Selectors.SelectorForPlnRatesSheets);
 
-            var results = await Task.WhenAll(usdTask, eurTask, plnTask);
+            //var results = await Task.WhenAll(usdTask, eurTask, plnTask);
 
-            var allRates = results.SelectMany(r => r).ToList();
+            //var allRates = results.SelectMany(r => r).ToList();
 
-            var currencyRateEntities = CreateCurrencyRateEntity(allRates);
+            //var currencyRateEntities = CreateCurrencyRateEntity(allRates);
 
-            await _currencyRateRepository.AddRangeAsync(currencyRateEntities);
+            //await _currencyRateRepository.AddRangeAsync(currencyRateEntities);
+
             _logger.LogInformation("Job finished");
         }
-        catch (Exception ex) 
+        catch (Exception ex)
         {
-            _logger.LogError($"Job finished with error: {ex.Message}");
+            _logger.LogError($"Job exception: {ex.Message}");
         }
         
     }
