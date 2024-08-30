@@ -5,6 +5,7 @@ using CurrencyExchange.Infrastructure.Repositories;
 using CurrencyRate.Application.DataAccess.Query;
 using CurrencyRate.Application.DataAccess.Repositories;
 using CurrencyRate.Application.Job;
+using CurrencyRate.WebApi.RequestHandle;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,8 +21,10 @@ builder.Services.AddScoped<ICurrencyRateQuery, CurrencyRateQuery>();
 builder.Services.AddScoped<ICurrencyRateRepository, CurrencyRateRepository>();
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<CurrencyRateContext>();
+builder.Services.AddExceptionHandler<ExceptionHandler>();
 
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
@@ -30,10 +33,13 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
     app.UseSwaggerUI();
 }
 
+
 app.Services.UseScheduler(scheduler =>
 {
     scheduler.Schedule<CurrencyRateJob>().EverySeconds(50);
 });
+
+app.UseExceptionHandler(_ => { });
 
 app.UseHttpsRedirection();
 
