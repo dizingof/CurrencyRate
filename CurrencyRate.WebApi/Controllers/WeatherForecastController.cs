@@ -27,7 +27,9 @@ namespace CurrencyRate.WebApi.Controllers
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
-            _logger.LogInformation(_configuration["test"]);
+            var a = _configuration["test"];
+            if (a == null || a == string.Empty) { a = "pusto"; }
+            _logger.LogInformation($"Log:{a}");
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
