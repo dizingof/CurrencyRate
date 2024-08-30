@@ -28,6 +28,7 @@ builder.Services.AddExceptionHandler<ExceptionHandler>();
 builder.Logging.ClearProviders();
 builder.Logging.AddFilter("Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddleware", LogLevel.None);
 builder.Logging.AddAzureWebAppDiagnostics();
+builder.Logging.AddFilter("Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddleware", LogLevel.None);
 
 var app = builder.Build();
 
