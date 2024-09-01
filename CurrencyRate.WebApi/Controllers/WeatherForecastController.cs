@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace CurrencyRate.WebApi.Controllers
 {

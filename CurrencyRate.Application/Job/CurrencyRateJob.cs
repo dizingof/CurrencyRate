@@ -1,8 +1,12 @@
-﻿using Coravel.Invocable;
+﻿using System.Diagnostics;
+using Coravel.Invocable;
 using CurrencyRate.Application.DataAccess.Query;
 using CurrencyRate.Application.DataAccess.Repositories;
 using CurrencyRate.Domain.Constants;
 using CurrencyRate.Domain.Entities;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 
@@ -30,7 +34,11 @@ public class CurrencyRateJob : IInvocable
     {
         try
         {
+            var telemetryClient = new TelemetryClient(new TelemetryConfiguration("9625215a-e7cd-41d5-845a-61d62224ef64"));
+
             _logger.LogInformation("Job started");
+            var timestamp = DateTimeOffset.Now;
+            var stopwatch = Stopwatch.StartNew();
 
             var usdTask = _currencyRateQuery.Execute(Urls.AddressUsdPage, Selectors.SelectorForUsdRatesSheets);
             var eurTask = _currencyRateQuery.Execute(Urls.AddressEurPage, Selectors.SelectorForEurRatesSheets);
@@ -43,6 +51,19 @@ public class CurrencyRateJob : IInvocable
             var currencyRateEntities = CreateCurrencyRateEntity(allRates);
 
             await _currencyRateRepository.AddRangeAsync(currencyRateEntities);
+
+            stopwatch.Stop();
+
+            var dependency = new DependencyTelemetry
+            {
+                Type = "Mongo",
+                Name = "CurrencyRateJob",                
+                Timestamp = timestamp,
+                Duration = stopwatch.Elapsed,
+                Success = true,
+            };
+
+            telemetryClient.TrackDependency(dependency);
 
             _logger.LogInformation("Job finished");
         }

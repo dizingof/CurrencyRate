@@ -6,13 +6,15 @@ using CurrencyRate.Application.DataAccess.Query;
 using CurrencyRate.Application.DataAccess.Repositories;
 using CurrencyRate.Application.Job;
 using CurrencyRate.WebApi.RequestHandle;
+using Microsoft.ApplicationInsights;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddApplicationInsightsTelemetry();
 // Add services to the container.
 builder.Logging.ClearProviders();
 
 builder.Logging.AddAzureWebAppDiagnostics();
+builder.Logging.AddConsole();
 builder.Logging.AddFilter("Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddleware", LogLevel.None);
 
 builder.Services.AddControllers();
@@ -26,6 +28,7 @@ builder.Services.AddScoped<ICurrencyRateRepository, CurrencyRateRepository>();
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<CurrencyRateContext>();
 builder.Services.AddExceptionHandler<ExceptionHandler>();
+builder.Services.AddSingleton<TelemetryClient>();
 
 
 
@@ -42,7 +45,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 
 app.Services.UseScheduler(scheduler =>
 {
-    scheduler.Schedule<CurrencyRateJob>().Hourly();
+    scheduler.Schedule<CurrencyRateJob>().EverySeconds(10);
 });
 
 app.UseExceptionHandler(_ => { });
