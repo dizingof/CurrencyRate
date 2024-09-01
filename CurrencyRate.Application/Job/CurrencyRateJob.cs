@@ -17,24 +17,27 @@ public class CurrencyRateJob : IInvocable
     private readonly ICurrencyRateQuery _currencyRateQuery;
     private readonly ICurrencyRateRepository _currencyRateRepository;
     private readonly ILogger<CurrencyRateJob> _logger;
+    private readonly TelemetryClient _telemetryClient;
 
     public CurrencyRateJob
     (
         ICurrencyRateQuery currencyRateQuery,
         ICurrencyRateRepository currencyRateRepository,
-        ILogger<CurrencyRateJob> logger
+        ILogger<CurrencyRateJob> logger,
+        TelemetryClient telemetryClient
     )
     {
         _currencyRateQuery = currencyRateQuery;
         _currencyRateRepository = currencyRateRepository;
         _logger = logger;
+        _telemetryClient = telemetryClient;
     }
 
     public async Task Invoke()
     {
         try
         {
-            var telemetryClient = new TelemetryClient(new TelemetryConfiguration("9625215a-e7cd-41d5-845a-61d62224ef64"));
+           
 
             _logger.LogInformation("Job started");
             var timestamp = DateTimeOffset.Now;
@@ -63,7 +66,7 @@ public class CurrencyRateJob : IInvocable
                 Success = true,
             };
 
-            telemetryClient.TrackDependency(dependency);
+            _telemetryClient.TrackDependency(dependency);
 
             _logger.LogInformation("Job finished");
         }
