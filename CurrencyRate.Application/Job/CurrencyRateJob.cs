@@ -6,7 +6,6 @@ using CurrencyRate.Domain.Constants;
 using CurrencyRate.Domain.Entities;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
-using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 
@@ -37,21 +36,13 @@ public class CurrencyRateJob : IInvocable
     {
         try
         {
-           
-
             _logger.LogInformation("Job started");
+
+            var allRates = GetRateFromExternalResource();
+            var currencyRateEntities = CreateCurrencyRateEntity(await allRates);
+
             var timestamp = DateTimeOffset.Now;
             var stopwatch = Stopwatch.StartNew();
-
-            var usdTask = _currencyRateQuery.Execute(Urls.AddressUsdPage, Selectors.SelectorForUsdRatesSheets);
-            var eurTask = _currencyRateQuery.Execute(Urls.AddressEurPage, Selectors.SelectorForEurRatesSheets);
-            var plnTask = _currencyRateQuery.Execute(Urls.AddressPlnPage, Selectors.SelectorForPlnRatesSheets);
-
-            var results = await Task.WhenAll(usdTask, eurTask, plnTask);
-
-            var allRates = results.SelectMany(r => r).ToList();
-
-            var currencyRateEntities = CreateCurrencyRateEntity(allRates);
 
             await _currencyRateRepository.AddRangeAsync(currencyRateEntities);
 
@@ -59,11 +50,12 @@ public class CurrencyRateJob : IInvocable
 
             var dependency = new DependencyTelemetry
             {
-                Type = "Mongo",
-                Name = "CurrencyRateJob",                
+                Type = "Database",
+                Name = "Mongo",
                 Timestamp = timestamp,
                 Duration = stopwatch.Elapsed,
                 Success = true,
+                Data = nameof(CurrencyRateJob)
             };
 
             _telemetryClient.TrackDependency(dependency);
@@ -73,8 +65,26 @@ public class CurrencyRateJob : IInvocable
         catch (Exception ex)
         {
             _logger.LogError($"Job exception: {ex.Message}");
+            var exceptionTelemetry = new ExceptionTelemetry(ex)
+            {
+                SeverityLevel = SeverityLevel.Error,
+                Timestamp = DateTimeOffset.Now
+            };
+            _telemetryClient.TrackException(exceptionTelemetry);
         }
-        
+
+    }
+
+    private async Task<List<RateDto>> GetRateFromExternalResource()
+    {
+        var usdTask = _currencyRateQuery.Execute(Urls.AddressUsdPage, Selectors.SelectorForUsdRatesSheets);
+        var eurTask = _currencyRateQuery.Execute(Urls.AddressEurPage, Selectors.SelectorForEurRatesSheets);
+        var plnTask = _currencyRateQuery.Execute(Urls.AddressPlnPage, Selectors.SelectorForPlnRatesSheets);
+
+        var results = await Task.WhenAll(usdTask, eurTask, plnTask);
+
+        var allRates = results.SelectMany(r => r).ToList();
+        return allRates;
     }
 
     private List<CurrencyRateEntity> CreateCurrencyRateEntity(List<RateDto> rateDtos)
@@ -93,7 +103,6 @@ public class CurrencyRateJob : IInvocable
             };
             currencyRateEntities.Add(currencyRateEntity);
         }
-
         return currencyRateEntities;
     }
 }

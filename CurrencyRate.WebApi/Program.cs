@@ -10,30 +10,29 @@ using Microsoft.ApplicationInsights;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplicationInsightsTelemetry();
-// Add services to the container.
+
 builder.Logging.ClearProviders();
 
 builder.Logging.AddAzureWebAppDiagnostics();
 builder.Logging.AddConsole();
 builder.Logging.AddFilter("Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddleware", LogLevel.None);
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddScheduler();
+builder.Services.AddSingleton<CurrencyRateContext>();
+builder.Services.AddSingleton<TelemetryClient>();
 builder.Services.AddScoped<CurrencyRateJob>();
 builder.Services.AddScoped<ICurrencyRateQuery, CurrencyRateQuery>();
 builder.Services.AddScoped<ICurrencyRateRepository, CurrencyRateRepository>();
+
+builder.Services.AddControllers();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+builder.Services.AddScheduler();
 builder.Services.AddHttpClient();
-builder.Services.AddSingleton<CurrencyRateContext>();
 builder.Services.AddExceptionHandler<ExceptionHandler>();
-builder.Services.AddSingleton<TelemetryClient>();
-
-
 
 var app = builder.Build();
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
@@ -41,7 +40,6 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 
 app.Services.UseScheduler(scheduler =>
 {
