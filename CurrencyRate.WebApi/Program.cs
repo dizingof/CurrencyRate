@@ -17,8 +17,8 @@ builder.Logging.AddAzureWebAppDiagnostics();
 builder.Logging.AddConsole();
 builder.Logging.AddFilter("Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddleware", LogLevel.None);
 
-builder.Services.AddSingleton<CurrencyRateContext>();
 builder.Services.AddSingleton<TelemetryClient>();
+builder.Services.AddScoped<CurrencyRateContext>();
 builder.Services.AddScoped<CurrencyRateJob>();
 builder.Services.AddScoped<ICurrencyRateQuery, CurrencyRateQuery>();
 builder.Services.AddScoped<ICurrencyRateRepository, CurrencyRateRepository>();
@@ -43,7 +43,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 
 app.Services.UseScheduler(scheduler =>
 {
-    scheduler.Schedule<CurrencyRateJob>().EverySeconds(10);
+    scheduler.Schedule<CurrencyRateJob>().EverySeconds(59);
 });
 
 app.UseExceptionHandler(_ => { });
