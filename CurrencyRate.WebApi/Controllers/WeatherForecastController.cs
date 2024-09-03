@@ -36,5 +36,11 @@ namespace CurrencyRate.WebApi.Controllers
             })
             .ToArray();
         }
+
+        [HttpGet("unfreeze")]
+        public IActionResult GetUnfreeze()
+        {
+            return Ok("Application is alive");
+        }
     }
 }
