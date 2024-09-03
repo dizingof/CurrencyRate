@@ -59,7 +59,7 @@ try
     // 7. Settings scheduler
     app.Services.UseScheduler(scheduler =>
     {
-        scheduler.Schedule<CurrencyRateJob>().EverySeconds(59);
+        scheduler.Schedule<CurrencyRateJob>().HourlyAt(10);
     });
 
     // 8. Setting differents midlware
