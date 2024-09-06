@@ -94,7 +94,7 @@ public class CurrencyRateJob : IInvocable
         {
             var currencyRateEntity = new CurrencyRateEntity
             {
-                _id = ObjectId.GenerateNewId(),
+                Id = ObjectId.GenerateNewId(),
                 CreatedDate = DateTime.Now,
                 BuyRate = decimal.Parse(rateDto.BuyRate),
                 SellRate = decimal.Parse(rateDto.SellRate),
