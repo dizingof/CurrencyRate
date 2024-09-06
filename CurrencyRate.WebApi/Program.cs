@@ -1,4 +1,3 @@
-using Amazon.Runtime.Internal.Util;
 using Coravel;
 using CurrencyExchange.Infrastructure.DataAccess;
 using CurrencyExchange.Infrastructure.DataAccess.Query;
@@ -6,6 +5,7 @@ using CurrencyExchange.Infrastructure.Repositories;
 using CurrencyRate.Application.DataAccess.Query;
 using CurrencyRate.Application.DataAccess.Repositories;
 using CurrencyRate.Application.Job;
+using CurrencyRate.Application.Services;
 using CurrencyRate.WebApi.RequestHandle;
 using Microsoft.ApplicationInsights;
 using Microsoft.EntityFrameworkCore;
@@ -38,6 +38,7 @@ try
     builder.Services.AddScoped<CurrencyRateJob>();
     builder.Services.AddScoped<ICurrencyRateQuery, CurrencyRateQuery>();
     builder.Services.AddScoped<ICurrencyRateRepository, CurrencyRateRepository>();
+    builder.Services.AddTransient<ICurrencyRateService, CurrencyRateService>();
 
     // 5. Setting Controllers, Swager and other
     builder.Services.AddControllers();

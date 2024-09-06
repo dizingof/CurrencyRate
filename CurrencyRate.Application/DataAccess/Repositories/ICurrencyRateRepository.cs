@@ -7,5 +7,6 @@ namespace CurrencyRate.Application.DataAccess.Repositories
         Task AddAsync(CurrencyRateEntity currencyRateEntity);
         Task AddRangeAsync(List<CurrencyRateEntity> currencyRateEntities);
         Task<List<CurrencyRateEntity>> GetAllAsync();
+        Task<List<CurrencyRateEntity>> GetRateByDateAsync(DateTime dateTime);
     }
 }

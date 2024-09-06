@@ -30,5 +30,13 @@ namespace CurrencyExchange.Infrastructure.Repositories
         {
             return await _context.CurrencyRates.ToListAsync();
         }
+
+        public async Task<List<CurrencyRateEntity>> GetRateByDateAsync(DateTime dateTime)
+        {
+            var todayRates = await _context.CurrencyRates
+                .Where(r => r.CreatedDate.Date == dateTime)
+                .ToListAsync();
+            return todayRates;
+        }
     }
 }
