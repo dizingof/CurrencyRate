@@ -61,6 +61,7 @@ try
     app.Services.UseScheduler(scheduler =>
     {
         scheduler.Schedule<CurrencyRateJob>().Cron("3 * * * *");
+        //scheduler.Schedule<CurrencyRateJob>().EveryFifteenSeconds();
     });
 
     // 8. Setting differents midlware

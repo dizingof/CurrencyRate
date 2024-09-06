@@ -23,9 +23,8 @@ namespace CurrencyRate.Application.Services
                 var lastUpdatedTime = todayRates.Max(rate => rate.CreatedDate);
 
                 var latestUpdatedRates = todayRates.Where(x => x.CreatedDate == lastUpdatedTime)
-                                                   .Where(x => x.CurrencyCode == currencyCode)
+                                                   .Where(x => x.CurrencyCode == currencyCode)                                                 
                                                    .ToList();
-
                 return latestUpdatedRates; 
             }
             return todayRates;
